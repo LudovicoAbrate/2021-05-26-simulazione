@@ -5,8 +5,10 @@
 package it.polito.tdp.yelp;
 
 import java.net.URL;
+import java.time.Year;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.yelp.model.Business;
 import it.polito.tdp.yelp.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,16 +37,16 @@ public class FXMLController {
     private Button btnPercorso; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbCitta"
-    private ComboBox<?> cmbCitta; // Value injected by FXMLLoader
+    private ComboBox<String> cmbCitta; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtX"
     private TextField txtX; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbAnno"
-    private ComboBox<?> cmbAnno; // Value injected by FXMLLoader
+    private ComboBox<Year> cmbAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbLocale"
-    private ComboBox<?> cmbLocale; // Value injected by FXMLLoader
+    private ComboBox<Business> cmbLocale; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -56,12 +58,31 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	
+    	String citta = cmbCitta.getValue();
+    	Year anno = cmbAnno.getValue() ;
+    	
+    	
+    	if( anno==null || citta == null) {
+    		txtResult.appendText("Parametri obbligatori");
+    		return ;
+    	}
+    	
+    	this.model.creaGrafo( anno,citta);
+    	
+		   txtResult.appendText("grafo creato: "+"\n");
+		   txtResult.appendText("# VERTICI: "+this.model.nVertici()+"\n");
+		   txtResult.appendText("# ARCHI: "+this.model.nArchi()+"\n");
 
     }
 
     @FXML
     void doLocaleMigliore(ActionEvent event) {
-
+    
+    	
+    	Business best = model.getLocaleMigliore() ; // prendo il business
+    	
+    	txtResult.appendText("Locale migliore: "+best.getBusinessName()+"\n"); // stampo la sua stringa id
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -78,5 +99,11 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	for(int anno=2005; anno<=2013; anno++) {
+    		cmbAnno.getItems().add(Year.of(anno)) ;
+    	}
+    	
+    	this.cmbCitta.getItems().addAll(model.getCities());
     }
 }
